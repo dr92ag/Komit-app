@@ -447,4 +447,58 @@
     });
 
     let currentModalTarget = 'komeit';
-    function openAddMod
+    function openAddModal(target) {
+      currentModalTarget = target;
+      document.getElementById('modalTitle').innerText = target === 'komeit' ? 'إضافة دواء للكُميت' : 'إضافة دواء لهبة';
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      document.getElementById('newMedStart').value = now.toISOString().slice(0, 16);
+      document.getElementById('addMedModal').classList.remove('hidden');
+    }
+    function closeAddModal() {
+      document.getElementById('addMedModal').classList.add('hidden');
+    }
+
+    function saveNewMedication() {
+      const name = document.getElementById('newMedName').value.trim();
+      const dose = document.getElementById('newMedDose').value.trim();
+      const intervalHours = parseInt(document.getElementById('newMedInterval').value) || 8;
+      const durationDays = parseInt(document.getElementById('newMedDuration').value) || 7;
+      const startVal = document.getElementById('newMedStart').value;
+      const start = startVal ? new Date(startVal).getTime() : Date.now();
+
+      if (!name || !dose) return;
+
+      const newKey = 'med_' + Date.now();
+      db.ref(`medications_protocol/${currentModalTarget}/${newKey}`).set({
+        name, dose, intervalHours, durationDays, start, type: 'علاج مخصص'
+      }).then(() => {
+        closeAddModal();
+        document.getElementById('newMedName').value = '';
+        document.getElementById('newMedDose').value = '';
+      });
+    }
+
+    function deleteMedication(target, key) {
+      if (confirm('هل ترغب بحذف هذا الدواء؟')) {
+        db.ref(`medications_protocol/${target}/${key}`).remove();
+      }
+    }
+
+    function switchTab(tab) {
+      if (tab === 'komeit') {
+        document.getElementById('komeitSection').classList.remove('hidden');
+        document.getElementById('hebaSection').classList.add('hidden');
+        document.getElementById('tabKomeit').className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition bg-cyan-500 text-slate-950 shadow-md";
+        document.getElementById('tabHeba').className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition text-slate-400 hover:text-white";
+      } else {
+        document.getElementById('komeitSection').classList.add('hidden');
+        document.getElementById('hebaSection').classList.remove('hidden');
+        document.getElementById('tabHeba').className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition bg-cyan-500 text-slate-950 shadow-md";
+        document.getElementById('tabKomeit').className = "flex-1 py-2.5 text-xs font-bold rounded-xl transition text-slate-400 hover:text-white";
+      }
+    }
+  </script>
+</body>
+</html>
+
