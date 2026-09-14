@@ -1,1 +1,509 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>&#1585;&#1593;&#1575;&#1610;&#1577; &#1575;&#1604;&#1603;&#1615;&#1605;&#1610;&#1578; | Al-Komeit Care</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;800;900&display=swap');
+    body { font-family: 'Tajawal', sans-serif; }
+    .glass-card { background: rgba(30, 41, 59, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-16">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 glass-card border-b border-slate-800 px-4 py-3">
+    <div class="max-w-2xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-lg font-black text-lg">
+          &#1603;
+        </div>
+        <div>
+          <h1 class="text-base font-bold text-white leading-tight">&#1575;&#1604;&#1585;&#1593;&#1575;&#1610;&#1577; &#1575;&#1604;&#1587;&#1585;&#1610;&#1585;&#1610;&#1577; &#1604;&#1604;&#1603;&#1615;&#1605;&#1610;&#1578;</h1>
+          <div class="flex items-center gap-2 text-xs text-slate-400">
+            <span id="deviceRoleBadge" class="text-cyan-400 font-medium">&#1580;&#1607;&#1575;&#1580; &#1594;&#1610;&#1585; &#1605;&#1581;&#1583;&#1583;</span>
+            <span>&bull;</span>
+            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+            <span>&#1605;&#1578;&#1586;&#1575;&#1605;&#1606; &#1604;&#1581;&#1598;&#1610;&#1575;&#1613;</span>
+          </div>
+        </div>
+      </div>
+      <button onclick="toggleUserRole()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-xl transition">
+        <i class="fa-solid fa-arrows-rotate ml-1"></i> &#1578;&#1576;&#1583;&#1610;&#1604; &#1575;&#1604;&#1607;&#1608;&#1610;&#1577;
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-2xl mx-auto px-4 mt-4 space-y-4">
+
+    <!-- Baby Stats Card -->
+    <div class="glass-card rounded-3xl p-5 border-cyan-500/20 shadow-xl">
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <span class="text-[11px] font-semibold text-cyan-400 bg-cyan-500/10 px-2.5 py-1 rounded-full border border-cyan-500/20">&#1576;&#1591;&#1575;&#1602;&#1577; &#1575;&#1604;&#1605;&#1608;&#1604;&#1608;&#1583;</span>
+          <h2 class="text-2xl font-black text-white mt-2">&#1575;&#1604;&#1603;&#1615;&#1605;&#1610;&#1578; &#1571;&#1594;&#1610;&#1583; &#158array;&#1575;&#1588;</h2>
+          <p class="text-xs text-slate-400 mt-0.5">&#1575;&#1604;&#1608;&#1604;&#1575;&#1583;&#1577;: 12 &#1571;&#1610;&#1604;&#1608;&#1604; 2026 &mdash; 05:35 &#1589;&#1576;&#1575;&#1581;&#1575;&#1613;</p>
+        </div>
+        <div class="text-left bg-slate-900/80 border border-slate-700/60 p-2.5 rounded-2xl">
+          <div class="text-[10px] text-slate-400">&#1575;&#1604;&#1593;&#1605;&#1585; &#1575;&#1604;&#1583;&#1602;&#1610;&#1602;</div>
+          <div id="liveAgeCounter" class="text-sm font-bold text-cyan-300 font-mono mt-0.5">--</div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 text-center pt-3 border-t border-slate-800">
+        <div class="bg-slate-900/50 p-2.5 rounded-2xl border border-slate-800">
+          <div class="text-[11px] text-slate-400">&#1575;&#1604;&#1608;&#1586;&#1606;</div>
+          <div class="text-base font-extrabold text-white">2,800 <span class="text-[10px] text-slate-400">&#1594;</span></div>
+          <div class="text-[10px] text-emerald-400">&#1591;&#1576;&#1610;&#1593;&#1610; (15-25%)</div>
+        </div>
+        <div class="bg-slate-900/50 p-2.5 rounded-2xl border border-slate-800">
+          <div class="text-[11px] text-slate-400">&#1575;&#1604;&#1591;&#1608;&#1604;</div>
+          <div class="text-base font-extrabold text-white">49 <span class="text-[10px] text-slate-400">&#1587;&#1605;</span></div>
+          <div class="text-[10px] text-emerald-400">&#1591;&#1576;&#1610;&#1593;&#1610; (35-50%)</div>
+        </div>
+        <div class="bg-slate-900/50 p-2.5 rounded-2xl border border-slate-800">
+          <div class="text-[11px] text-slate-400">&#1605;&#1581;&#1610;&#1591; &#1575;&#1604;&#1585;&#1571;&#1587;</div>
+          <div class="text-base font-extrabold text-white">33 <span class="text-[10px] text-slate-400">&#1587;&#1605;</span></div>
+          <div class="text-[10px] text-emerald-400">&#1591;&#1576;&#1610;&#1593;&#1610; (20-30%)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Button -->
+    <div id="notifActivationCard" class="bg-gradient-to-r from-cyan-950 via-slate-900 to-slate-900 p-4 rounded-2xl border border-cyan-500/30 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-base">
+          <i class="fa-solid fa-bell"></i>
+        </div>
+        <div class="text-xs">
+          <div class="font-bold text-white">&#1578;&#1601;&#1593;&#1610;&#1604; &#1575;&#1604;&#1578;&#1606;&#1576;&#1610;&#1607;&#1575;&#1578; &#1608;&#1575;&#1604;&#1589;&#1608;&#1578;</div>
+          <div class="text-slate-400">&#1604;&#1604;&#1578;&#1606;&#1576;&#1610;&#1607; &#1576;&#1605;&#1608;&#1575;&#1593;&#1610;&#1583; &#1575;&#1604;&#1580;&#1585;&#1593;&#1575;&#1578; &#1608;&#1578;&#1571;&#1603;&#1610;&#1583;&#1607;&#1575;</div>
+        </div>
+      </div>
+      <button id="enableNotifBtn" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs px-4 py-2 rounded-xl transition">
+        &#1578;&#1601;&#1593;&#1610;&#1604;
+      </button>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="flex bg-slate-900 p-1 rounded-2xl border border-slate-800">
+      <button onclick="switchTab('komeit')" id="tabKomeit" class="flex-1 py-2 text-xs font-bold rounded-xl transition bg-cyan-500 text-slate-950">
+        <i class="fa-solid fa-baby ml-1"></i> &#1571;&#1583;&#1608;&#1610;&#1577; &#1575;&#1604;&#1603;&#1615;&#1605;&#1610;&#1578;
+      </button>
+      <button onclick="switchTab('heba')" id="tabHeba" class="flex-1 py-2 text-xs font-bold rounded-xl transition text-slate-400 hover:text-white">
+        <i class="fa-solid fa-heart-pulse ml-1"></i> &#1571;&#1583;&#1608;&#1610;&#1577; &#1607;&#1576;&#1577;
+      </button>
+    </div>
+
+    <!-- Komeit Meds List -->
+    <div id="komeitSection" class="space-y-3">
+      <div class="flex justify-between items-center px-1">
+        <h3 class="text-xs font-bold text-slate-400">&#1575;&#1604;&#1576;&#1585;&#1608;&#1578;&#1608;&#1603;&#1608;&#1604; &#1575;&#1604;&#1593;&#1604;&#1575;&#1580;&#1610; &#1604;&#1604;&#1608;&#1604;&#1610;&#1583;</h3>
+        <button onclick="openAddModal('komeit')" class="text-xs text-cyan-400 hover:text-cyan-300 font-semibold">
+          <i class="fa-solid fa-circle-plus ml-1"></i> &#1573;&#1590;&#1575;&#1601;&#1577; &#1583;&#1608;&#1575;&#1583;
+        </button>
+      </div>
+      <div id="komeitMedsList" class="space-y-3"></div>
+    </div>
+
+    <!-- Heba Meds List -->
+    <div id="hebaSection" class="space-y-3 hidden">
+      <div class="flex justify-between items-center px-1">
+        <h3 class="text-xs font-bold text-slate-400">&#1571;&#1583;&#1608;&#1610;&#1577; &#1578;&#1593;&#1575;&#1601;&#1610; &#1575;&#1604;&#1602;&#1610;&#1587;&#1585;&#1610;&#1577;</h3>
+        <button onclick="openAddModal('heba')" class="text-xs text-cyan-400 hover:text-cyan-300 font-semibold">
+          <i class="fa-solid fa-circle-plus ml-1"></i> &#1573;&#1590;&#1575;&#1601;&#1577; &#1583;&#1608;&#1575;&#1583;
+        </button>
+      </div>
+      <div id="hebaMedsList" class="space-y-3"></div>
+    </div>
+
+    <!-- Confirmation Ledger -->
+    <div class="glass-card rounded-3xl p-5 border-slate-800">
+      <div class="text-xs font-bold text-slate-400 mb-3 flex items-center justify-between">
+        <span><i class="fa-solid fa-handshake-simple ml-1.5 text-cyan-400"></i> &#1587;&#1580;&#1604; &#1575;&#1604;&#1573;&#1593;&#1591;&#1575;&#1583; &#1608;&#1575;&#1604;&#1578;&#1571;&#1603;&#1610;&#1583; &#1575;&#1604;&#1604;&#1581;&#1598;&#1610;</span>
+      </div>
+      <div id="confirmationsLog" class="space-y-2 max-h-48 overflow-y-auto text-xs text-slate-300 pr-1">
+        <div class="text-slate-500 text-center py-3">&#1576;&#1575;&#1606;&#1578;&#1598;&#1575;&#1585; &#1578;&#1587;&#1580;&#1610;&#1604; &#1571;&#1608;&#1604; &#1580;&#1585;&#1593;&#1577;...</div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Add Medication Modal -->
+  <div id="addMedModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl p-5 w-full max-w-sm space-y-3">
+      <div class="flex justify-between items-center">
+        <h3 id="modalTitle" class="text-sm font-bold text-white">&#1573;&#1590;&#1575;&#1601;&#1577; &#1583;&#1608;&#1575;&#1583;</h3>
+        <button onclick="closeAddModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="space-y-2.5 text-xs">
+        <div>
+          <label class="block text-slate-400 mb-1">&#1575;&#1587;&#1605; &#1575;&#1604;&#1583;&#1608;&#1575;&#1583;</label>
+          <input type="text" id="newMedName" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-400 mb-1">&#1575;&#1604;&#1580;&#1585;&#1593;&#1577;</label>
+            <input type="text" id="newMedDose" placeholder="1.5 ml" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">&#1603;&#1604; (&#1587;&#1575;&#1593;&#1577;)</label>
+            <input type="number" id="newMedInterval" value="8" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-400 mb-1">&#1575;&#1604;&#1605;&#1583;&#1577; (&#1571;&#1610;&#1575;&#1605;)</label>
+            <input type="number" id="newMedDuration" value="7" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-cyan-500">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">&#1608;&#1602;&#1578; &#1575;&#1604;&#1576;&#1583;&#1583;</label>
+            <input type="datetime-local" id="newMedStart" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-2 py-1.5 text-white focus:outline-none focus:border-cyan-500">
+          </div>
+        </div>
+      </div>
+
+      <button onclick="saveNewMedication()" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-2.5 rounded-xl transition text-xs">
+        &#1581;&#1601;&#1598; &#1601;&#1610; &#1575;&#1604;&#1587;&#1581;&#1575;&#1576;&#1577;
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDf3JnsqQES-151nZewP7eC1QCjdS6uVxA",
+      authDomain: "heba-meds.firebaseapp.com",
+      databaseURL: "https://heba-meds-default-rtdb.firebaseio.com",
+      projectId: "heba-meds",
+      storageBucket: "heba-meds.firebasestorage.app",
+      messagingSenderId: "54281784192",
+      appId: "1:54281784192:web:7ffb7e6db13f02a9f1cf65"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.database();
+
+    let currentRole = localStorage.getItem('care_role') || 'د. أغيد (الأب)';
+    function updateRoleUI() {
+      document.getElementById('deviceRoleBadge').innerText = currentRole;
+    }
+    function toggleUserRole() {
+      currentRole = (currentRole.includes('أغيد')) ? 'هبة (الأم)' : 'د. أغيد (الأب)';
+      localStorage.setItem('care_role', currentRole);
+      updateRoleUI();
+    }
+    updateRoleUI();
+
+    const birthTimestamp = new Date(2026, 8, 12, 5, 35, 0).getTime();
+    function updateLiveAge() {
+      const diff = Math.max(0, Date.now() - birthTimestamp);
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+
+      document.getElementById('liveAgeCounter').innerText = 
+        `${days} يوم و ${hours} س و ${minutes} د`;
+    }
+    setInterval(updateLiveAge, 1000);
+    updateLiveAge();
+
+    let audioCtx = null;
+    function playSound(type) {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        if (type === 'alarm') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(659.25, now);
+          osc.frequency.setValueAtTime(880.00, now + 0.2);
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+          osc.start(now);
+          osc.stop(now + 0.8);
+        } else {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.setValueAtTime(659.25, now + 0.15);
+          osc.frequency.setValueAtTime(1046.50, now + 0.3);
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
+          osc.start(now);
+          osc.stop(now + 0.7);
+        }
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+      } catch (e) {}
+    }
+
+    let swReg = null;
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').then(r => swReg = r);
+    }
+
+    document.getElementById('enableNotifBtn').addEventListener('click', () => {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      audioCtx.resume();
+      playSound('confirm');
+      Notification.requestPermission().then(p => {
+        if (p === 'granted') {
+          document.getElementById('notifActivationCard').classList.add('hidden');
+        }
+      });
+    });
+
+    const defaultMeds = {
+      komeit: {
+        nutrical: {
+          name: "نوتريكال (كالسيوم)",
+          dose: "1.5 مل بالسرنجة",
+          intervalHours: 8,
+          durationDays: 14,
+          start: new Date(2026, 8, 13, 14, 0).getTime(),
+          type: "شراب"
+        },
+        kd_drops: {
+          name: "فيتامين ك + د (K1 & D3)",
+          dose: "قطارة كاملة يومياً",
+          intervalHours: 24,
+          durationDays: 90,
+          start: new Date(2026, 8, 13, 17, 0).getTime(),
+          type: "قطرات"
+        },
+        optrex: {
+          name: "أوبتريكس عينية",
+          dose: "قطرة بكل عين",
+          intervalHours: 6,
+          durationDays: 5,
+          start: new Date(2026, 8, 13, 0, 0).getTime(),
+          type: "قطرة"
+        },
+        hexamidine: {
+          name: "تعقيم السرة (هيكزاميدين)",
+          dose: "مسح موضعي معقم",
+          intervalHours: 8,
+          durationDays: 5,
+          start: new Date(2026, 8, 12, 10, 0).getTime(),
+          type: "مطهر"
+        }
+      },
+      heba: {
+        aurioclav: {
+          name: "أوريوكلاف 1 غرام",
+          dose: "قرص واحد (1000 ملغ)",
+          intervalHours: 12,
+          durationDays: 7,
+          start: new Date(2026, 8, 13, 11, 0).getTime(),
+          type: "مضاد حيوي"
+        },
+        misoprostol: {
+          name: "ميزوبرستول",
+          dose: "200 مكغ بعد الرضاعة",
+          intervalHours: 8,
+          durationDays: 3,
+          start: new Date(2026, 8, 14, 14, 0).getTime(),
+          type: "أقراص رحمية"
+        }
+      }
+    };
+
+    db.ref('medications_protocol').once('value', snapshot => {
+      if (!snapshot.exists()) {
+        db.ref('medications_protocol').set(defaultMeds);
+      }
+    });
+
+    db.ref('medications_protocol').on('value', snapshot => {
+      const data = snapshot.val() || defaultMeds;
+      renderMedsList('komeit', data.komeit || {});
+      renderMedsList('heba', data.heba || {});
+    });
+
+    function renderMedsList(target, list) {
+      const container = document.getElementById(`${target}MedsList`);
+      container.innerHTML = '';
+
+      Object.entries(list).forEach(([key, med]) => {
+        const now = Date.now();
+        const start = med.start;
+        const totalDurationMs = med.durationDays * 24 * 60 * 60 * 1000;
+        const intervalMs = med.intervalHours * 60 * 60 * 1000;
+        
+        const elapsedTotal = Math.max(0, now - start);
+        const totalProgressPercent = Math.min(100, Math.round((elapsedTotal / totalDurationMs) * 100));
+
+        let nextDoseTime = start;
+        while (nextDoseTime <= now) {
+          nextDoseTime += intervalMs;
+        }
+
+        const msUntilNext = nextDoseTime - now;
+        const hoursLeft = Math.floor(msUntilNext / (1000 * 60 * 60));
+        const minsLeft = Math.floor((msUntilNext / (1000 * 60)) % 60);
+
+        const card = document.createElement('div');
+        card.className = "glass-card rounded-2xl p-4 border border-slate-800";
+        
+        card.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-[10px] font-semibold text-cyan-400 bg-cyan-950 px-2 py-0.5 rounded border border-cyan-800">${med.type}</span>
+              <h4 class="text-sm font-bold text-white mt-1">${med.name}</h4>
+              <p class="text-xs text-slate-400">&#1575;&#1604;&#1580;&#1585;&#1593;&#1577;: <span class="text-slate-200">${med.dose}</span> (&#1603;&#1604; ${med.intervalHours} &#1587;&#1575;&#1593;&#1575;&#1578;)</p>
+            </div>
+            <button onclick="deleteMedication('${target}', '${key}')" class="text-slate-500 hover:text-rose-400 text-xs p-1">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+
+          <div class="mt-3">
+            <div class="flex justify-between text-[10px] text-slate-400 mb-1 font-mono">
+              <span>&#1575;&#1604;&#1573;&#1606;&#1580;&#1575;&#1586;: ${totalProgressPercent}%</span>
+              <span>${med.durationDays} &#1610;&#1608;&#1605;</span>
+            </div>
+            <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+              <div class="h-full bg-cyan-500" style="width: ${totalProgressPercent}%"></div>
+            </div>
+          </div>
+
+          <div class="mt-3 pt-3 border-t border-slate-800 flex items-center justify-between">
+            <div class="text-[11px]">
+              <span class="text-slate-400">&#1575;&#1604;&#1602;&#1575;&#1583;&#1605;&#1577; &#1576;&#1593;&#1583;:</span>
+              <span class="font-bold font-mono text-cyan-300 mr-1">${hoursLeft}&#1587; ${minsLeft}&#1583;</span>
+            </div>
+            <button onclick="confirmDoseGiven('${med.name}', '${target}')" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1">
+              <i class="fa-solid fa-check"></i>
+                 <span>&#1578;&#1605; &#1575;&#1604;&#1573;&#1593;&#1591;&#1575;&#1583;</span>
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function confirmDoseGiven(medName, category) {
+      const confirmationData = {
+        medName: medName,
+        givenBy: currentRole,
+        timestamp: Date.now(),
+        timeStr: new Date().toLocaleTimeString('ar-SY', { hour: '2-digit', minute: '2-digit' }),
+        category: category
+      };
+
+      db.ref('dose_confirmations').push(confirmationData);
+      db.ref('sync_event').set({
+        type: 'DOSE_CONFIRMED',
+        message: `&#1602;&#1575;&#1605; ${currentRole} &#1576;&#1573;&#1593;&#1591;&#1575;&#1583;: ${medName}`,
+        time: Date.now()
+      });
+    }
+
+    const appOpenTime = Date.now();
+    db.ref('sync_event').on('value', snap => {
+      const ev = snap.val();
+      if (!ev || ev.time <= appOpenTime) return;
+
+      playSound('confirm');
+      if (swReg && Notification.permission === 'granted') {
+        swReg.active.postMessage({
+          type: 'SEND_NOTIFICATION',
+          title: '&#1578;&#1571;&#1603;&#1610;&#1583; &#1575;&#1604;&#1573;&#1593;&#1591;&#1575;&#1583; &#9989;',
+          body: ev.message
+        });
+      }
+    });
+
+    db.ref('dose_confirmations').limitToLast(8).on('value', snap => {
+      const list = snap.val();
+      const container = document.getElementById('confirmationsLog');
+      if (!list) return;
+
+      container.innerHTML = '';
+      Object.values(list).reverse().forEach(item => {
+        const row = document.createElement('div');
+        row.className = "flex items-center justify-between p-2 rounded-xl bg-slate-900/60 border border-slate-800 text-[11px]";
+        row.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <span class="text-white font-medium">${item.medName}</span>
+          </div>
+          <div class="text-slate-400">
+            <span class="text-cyan-400 font-semibold">${item.givenBy}</span>
+            <span class="font-mono text-[10px] mr-1">(${item.timeStr})</span>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    });
+
+    let currentModalTarget = 'komeit';
+    function openAddModal(target) {
+      currentModalTarget = target;
+      document.getElementById('modalTitle').innerText = target === 'komeit' ? '&#1573;&#1590;&#1575;&#1601;&#1577; &#1583;&#1608;&#1575;&#1583; &#1604;&#1604;&#1603;&#1615;&#1605;&#1610;&#1578;' : '&#1573;&#1590;&#1575;&#1601;&#1577; &#1583;&#1608;&#1575;&#1583; &#1604;&#1607;&#1576;&#1577;';
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      document.getElementById('newMedStart').value = now.toISOString().slice(0, 16);
+      document.getElementById('addMedModal').classList.remove('hidden');
+    }
+    function closeAddModal() {
+      document.getElementById('addMedModal').classList.add('hidden');
+    }
+
+    function saveNewMedication() {
+      const name = document.getElementById('newMedName').value.trim();
+      const dose = document.getElementById('newMedDose').value.trim();
+      const intervalHours = parseInt(document.getElementById('newMedInterval').value) || 8;
+      const durationDays = parseInt(document.getElementById('newMedDuration').value) || 7;
+      const startVal = document.getElementById('newMedStart').value;
+      const start = startVal ? new Date(startVal).getTime() : Date.now();
+
+      if (!name || !dose) return;
+
+      const newKey = 'med_' + Date.now();
+      db.ref(`medications_protocol/${currentModalTarget}/${newKey}`).set({
+        name, dose, intervalHours, durationDays, start, type: '&#1593;&#1604;&#1575;&#1580;'
+      }).then(() => {
+        closeAddModal();
+        document.getElementById('newMedName').value = '';
+        document.getElementById('newMedDose').value = '';
+      });
+    }
+
+    function deleteMedication(target, key) {
+      if (confirm('&#1607;&#1604; &#1578;&#1585;&#1594;&#1576; &#1576;&#1581;&#1584;&#1601; &#1607;&#1584;&#1575; &#1575;&#1604;&#1583;&#1608;&#1575;&#1583;&#1567;')) {
+        db.ref(`medications_protocol/${target}/${key}`).remove();
+      }
+    }
+
+    function switchTab(tab) {
+      if (tab === 'komeit') {
+        document.getElementById('komeitSection').classList.remove('hidden');
+        document.getElementById('hebaSection').classList.add('hidden');
+        document.getElementById('tabKomeit').className = "flex-1 py-2 text-xs font-bold rounded-xl transition bg-cyan-500 text-slate-950";
+        document.getElementById('tabHeba').className = "flex-1 py-2 text-xs font-bold rounded-xl transition text-slate-400 hover:text-white";
+      } else {
+        document.getElementById('komeitSection').classList.add('hidden');
+        document.getElementById('hebaSection').classList.remove('hidden');
+        document.getElementById('tabHeba').className = "flex-1 py-2 text-xs font-bold rounded-xl transition bg-cyan-500 text-slate-950";
+        document.getElementById('tabKomeit').className = "flex-1 py-2 text-xs font-bold rounded-xl transition text-slate-400 hover:text-white";
+      }
+    }
+  </script>
+</body>
+</html>
