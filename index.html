@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تتبع الكُميت</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1e3a8a">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- مكتبات Firebase الجاهزة للعمل المباشر -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col items-center p-4">
+
+  <div class="w-full max-w-md bg-slate-800 border border-slate-700 rounded-3xl p-6 shadow-2xl mt-4">
+    <div class="flex items-center justify-between border-b border-slate-700 pb-4 mb-6">
+      <div>
+        <h1 class="text-2xl font-black text-blue-400">تتبع الكُميت</h1>
+        <p class="text-xs text-slate-400 mt-1">نظام التنبيه المتزامن بين الجهازين</p>
+      </div>
+      <div class="h-3 w-3 rounded-full bg-emerald-500 animate-pulse"></div>
+    </div>
+
+    <!-- زر تفعيل التنبيهات والصوت -->
+    <button id="enableNotifBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-98 transition py-3.5 px-4 rounded-2xl font-bold text-white shadow-lg shadow-emerald-900/40 mb-6 flex items-center justify-center gap-2">
+      <span>🔔</span>
+      <span>تفعيل التنبيهات والصوت هنا</span>
+    </button>
+
+    <!-- أزرار الإرسال السريع -->
+    <div class="space-y-3">
+      <button onclick="sendQuickAlert('حان موعد قطارة فيتامين D3 + K1')" class="w-full bg-slate-700 hover:bg-slate-600 active:scale-98 transition py-3.5 px-4 rounded-2xl font-semibold flex items-center justify-between border border-slate-600">
+        <span>💧 فيتامين D3 و K1</span>
+        <span class="text-xs bg-blue-500/20 text-blue-300 py-1 px-2.5 rounded-lg">إرسال تنبيه</span>
+      </button>
+
+      <button onclick="sendQuickAlert('حان موعد رضعة الكُميت التمهيدية')" class="w-full bg-slate-700 hover:bg-slate-600 active:scale-98 transition py-3.5 px-4 rounded-2xl font-semibold flex items-center justify-between border border-slate-600">
+        <span>🍼 موعد الرضعة</span>
+        <span class="text-xs bg-indigo-500/20 text-indigo-300 py-1 px-2.5 rounded-lg">إرسال تنبيه</span>
+      </button>
+
+      <button onclick="sendQuickAlert('تنبيه عام بخصوص الكُميت')" class="w-full bg-slate-700 hover:bg-slate-600 active:scale-98 transition py-3.5 px-4 rounded-2xl font-semibold flex items-center justify-between border border-slate-600">
+        <span>📢 تنبيه عام</span>
+        <span class="text-xs bg-amber-500/20 text-amber-300 py-1 px-2.5 rounded-lg">إرسال تنبيه</span>
+      </button>
+    </div>
+
+    <!-- سجل آخر تنبيه وصل -->
+    <div class="mt-8 pt-4 border-t border-slate-700">
+      <div class="text-xs font-semibold text-slate-400 mb-2">آخر تنبيه متزامن:</div>
+      <div id="lastAlertBox" class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/60 text-sm text-slate-300 min-h-[60px] flex items-center justify-center text-center">
+        لا توجد تنبيهات واردة بعد.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 1. إعدادات Firebase الخاصة بمشروعك (heba-meds)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDf3JnsqQES-151nZewP7eC1QCjdS6uVxA",
+      authDomain: "heba-meds.firebaseapp.com",
+      databaseURL: "https://heba-meds-default-rtdb.firebaseio.com",
+      projectId: "heba-meds",
+      storageBucket: "heba-meds.firebasestorage.app",
+      messagingSenderId: "54281784192",
+      appId: "1:54281784192:web:7ffb7e6db13f02a9f1cf65"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.database();
+
+    // 2. توليد صوت التنبيه داخلياً عبر Web Audio API
+    let audioCtx = null;
+    function playAlertRingtone() {
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'triangle';
+        // إيقاع نغمي تصاعدي ملفت
+        osc.frequency.setValueAtTime(587.33, now);       // D5
+        osc.frequency.setValueAtTime(880.00, now + 0.15);  // A5
+        osc.frequency.setValueAtTime(1174.66, now + 0.3);  // D6
+
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.8);
+      } catch (e) {
+        console.error("تعذر تشغيل الصوت:", e);
+      }
+    }
+
+    // 3. تسجيل Service Worker
+    let swReg = null;
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => { swReg = reg; })
+        .catch(err => console.error("SW Error:", err));
+    }
+
+    // تفعيل الإذن والصوت
+    const enableBtn = document.getElementById('enableNotifBtn');
+    enableBtn.addEventListener('click', () => {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      audioCtx.resume();
+      playAlertRingtone();
+
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          enableBtn.innerHTML = "✅ التنبيهات والصوت مفعلة";
+          enableBtn.classList.replace('bg-emerald-600', 'bg-slate-700');
+          enableBtn.classList.add('cursor-default');
+          enableBtn.disabled = true;
+        } else {
+          alert('يرجى السماح بالإشعارات من إعدادات المتصفح لتلقي التنبيهات.');
+        }
+      });
+    });
+
+    // 4. إرسال التنبيه إلى Firebase
+    function sendQuickAlert(text) {
+      db.ref('alerts/latest').set({
+        title: "تنبيه الكُميت 🔔",
+        body: text,
+        time: Date.now()
+      });
+    }
+
+    // 5. الاستماع اللحظي للتنبيهات الصادرة من أي هاتف
+    const loadTime = Date.now();
+    db.ref('alerts/latest').on('value', snapshot => {
+      const data = snapshot.val();
+      if (!data) return;
+
+      // إظهار التنبيه إذا كان قد أُرسل للتو (بعد فتح التطبيق)
+      if (data.time > loadTime) {
+        playAlertRingtone();
+
+        document.getElementById('lastAlertBox').innerHTML = `
+          <div class="text-blue-400 font-bold mb-1">${data.title}</div>
+          <div class="text-white">${data.body}</div>
+        `;
+
+        if (swReg && Notification.permission === 'granted') {
+          swReg.active.postMessage({
+            type: 'SEND_NOTIFICATION',
+            title: data.title,
+            body: data.body
+          });
+        }
+      }
+    });
+  </script>
+</body>
+</html>
